@@ -1,4 +1,4 @@
-﻿using NS.Veterinaria.Api.Models;
+﻿using NS.Veterinary.Api.Models;
 using System.Linq.Expressions;
 
 namespace NS.Veterinary.Api.Interfaces

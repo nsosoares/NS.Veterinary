@@ -1,4 +1,4 @@
-﻿namespace NS.Veterinaria.Api.Helpers
+﻿namespace NS.Veterinary.Api.Helpers
 {
     public static class ErrorMessage
     {

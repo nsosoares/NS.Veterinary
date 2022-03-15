@@ -1,8 +1,8 @@
 ﻿using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using NS.Veterinaria.Api.Models;
-using NS.Veterinaria.Api.Validations;
+using NS.Veterinary.Api.Models;
+using NS.Veterinary.Api.Validations;
 using NS.Veterinary.Api.Notifications;
 using NS.Veterinary.Api.ViewModels;
 

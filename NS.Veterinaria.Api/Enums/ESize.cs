@@ -1,4 +1,4 @@
-﻿namespace NS.Veterinaria.Api.Enums
+﻿namespace NS.Veterinary.Api.Enums
 {
     public enum ESize
     {

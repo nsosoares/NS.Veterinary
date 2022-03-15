@@ -1,6 +1,6 @@
-﻿using NS.Veterinaria.Api.Enums;
+﻿using NS.Veterinary.Api.Enums;
 
-namespace NS.Veterinaria.Api.Models
+namespace NS.Veterinary.Api.Models
 {
     public class Animal : EntityBase
     {

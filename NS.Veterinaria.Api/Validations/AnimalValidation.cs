@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using NS.Veterinaria.Api.Helpers;
-using NS.Veterinaria.Api.Models;
+using NS.Veterinary.Api.Helpers;
+using NS.Veterinary.Api.Models;
 
-namespace NS.Veterinaria.Api.Validations
+namespace NS.Veterinary.Api.Validations
 {
     public class AnimalValidation : EntityBaseValidation<Animal>
     {

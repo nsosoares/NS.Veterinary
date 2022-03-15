@@ -1,4 +1,4 @@
-﻿using NS.Veterinaria.Api.Enums;
+﻿using NS.Veterinary.Api.Enums;
 
 namespace NS.Veterinary.Api.ViewModels
 {

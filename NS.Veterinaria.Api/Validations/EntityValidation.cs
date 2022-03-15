@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
-using NS.Veterinaria.Api.Models;
+using NS.Veterinary.Api.Models;
 
-namespace NS.Veterinaria.Api.Validations
+namespace NS.Veterinary.Api.Validations
 {
     public abstract class EntityValidation<TEntity> : AbstractValidator<TEntity> where TEntity : Entity
     {

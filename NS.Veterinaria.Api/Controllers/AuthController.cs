@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using NS.Veterinaria.Api.Helpers;
+using NS.Veterinary.Api.Helpers;
 using NS.Veterinary.Api.Extensions;
 using NS.Veterinary.Api.Notifications;
 using NS.Veterinary.Api.ViewModels;

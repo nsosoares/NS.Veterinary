@@ -22,7 +22,7 @@ namespace NS.Veterinary.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("NS.Veterinaria.Api.Models.Animal", b =>
+            modelBuilder.Entity("NS.Veterinary.Api.Models.Animal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,7 +56,7 @@ namespace NS.Veterinary.Api.Migrations
                     b.ToTable("Animal", (string)null);
                 });
 
-            modelBuilder.Entity("NS.Veterinaria.Api.Models.Treatment", b =>
+            modelBuilder.Entity("NS.Veterinary.Api.Models.Treatment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -86,7 +86,7 @@ namespace NS.Veterinary.Api.Migrations
                     b.ToTable("Treatment", (string)null);
                 });
 
-            modelBuilder.Entity("NS.Veterinaria.Api.Models.Veterinarian", b =>
+            modelBuilder.Entity("NS.Veterinary.Api.Models.Veterinarian", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -114,15 +114,15 @@ namespace NS.Veterinary.Api.Migrations
                     b.ToTable("Veterinarian", (string)null);
                 });
 
-            modelBuilder.Entity("NS.Veterinaria.Api.Models.Treatment", b =>
+            modelBuilder.Entity("NS.Veterinary.Api.Models.Treatment", b =>
                 {
-                    b.HasOne("NS.Veterinaria.Api.Models.Animal", "Animal")
+                    b.HasOne("NS.Veterinary.Api.Models.Animal", "Animal")
                         .WithMany("Treatments")
                         .HasForeignKey("AnimalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NS.Veterinaria.Api.Models.Veterinarian", "Veterinarian")
+                    b.HasOne("NS.Veterinary.Api.Models.Veterinarian", "Veterinarian")
                         .WithMany("Treatments")
                         .HasForeignKey("VeterinarianId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -133,12 +133,12 @@ namespace NS.Veterinary.Api.Migrations
                     b.Navigation("Veterinarian");
                 });
 
-            modelBuilder.Entity("NS.Veterinaria.Api.Models.Animal", b =>
+            modelBuilder.Entity("NS.Veterinary.Api.Models.Animal", b =>
                 {
                     b.Navigation("Treatments");
                 });
 
-            modelBuilder.Entity("NS.Veterinaria.Api.Models.Veterinarian", b =>
+            modelBuilder.Entity("NS.Veterinary.Api.Models.Veterinarian", b =>
                 {
                     b.Navigation("Treatments");
                 });

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NS.Veterinaria.Api.Models;
+using NS.Veterinary.Api.Models;
 using NS.Veterinary.Api.ViewModels;
 
 namespace NS.Veterinary.Api.Configurations

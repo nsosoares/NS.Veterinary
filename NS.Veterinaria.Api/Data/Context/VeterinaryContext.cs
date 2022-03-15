@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NS.Veterinaria.Api.Models;
+using NS.Veterinary.Api.Models;
 
 namespace NS.Veterinary.Api.Data.Context
 {

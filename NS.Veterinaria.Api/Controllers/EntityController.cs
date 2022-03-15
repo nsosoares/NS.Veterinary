@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using NS.Veterinaria.Api.Helpers;
-using NS.Veterinaria.Api.Models;
+using NS.Veterinary.Api.Helpers;
+using NS.Veterinary.Api.Models;
 using NS.Veterinary.Api.Interfaces;
 using NS.Veterinary.Api.Notifications;
 using NS.Veterinary.Api.ViewModels;

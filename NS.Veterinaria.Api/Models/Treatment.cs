@@ -1,4 +1,4 @@
-﻿namespace NS.Veterinaria.Api.Models
+﻿namespace NS.Veterinary.Api.Models
 {
     public class Treatment : Entity
     {

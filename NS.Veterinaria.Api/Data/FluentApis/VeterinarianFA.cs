@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NS.Veterinaria.Api.Models;
+using NS.Veterinary.Api.Models;
 
 namespace NS.Veterinary.Api.Data.FluentApis
 {
