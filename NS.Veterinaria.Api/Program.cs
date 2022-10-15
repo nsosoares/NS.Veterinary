@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NS.Veterinary.Api.Configurations;
 using NS.Veterinary.Api.Data.Context;
@@ -20,6 +21,7 @@ builder.Services.AddCors(options =>
 var services = builder.Services;
 // Add services to the container.
 services.AddDbContext<VeterinaryContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 services.AddControllers();
 services.RegisterServices();
 
