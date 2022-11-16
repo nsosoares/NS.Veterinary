@@ -11,6 +11,14 @@ namespace NS.Veterinary.Api.Data.Repositorys
         {
         }
 
+        public override async Task<IEnumerable<Treatment>> GetAllAsync()
+        {
+            return await _table.AsNoTracking()
+                .Include(entity => entity.Veterinarian)
+                .Include(entity => entity.Animal)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Treatment>> GetByAnimalIdAsync(Guid animalId)
             => await _table.AsNoTracking().Where(treatment => treatment.AnimalId == animalId).ToListAsync();
 

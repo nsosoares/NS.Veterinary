@@ -38,6 +38,9 @@ namespace NS.Veterinary.Api.Configurations
                     , treatmentVm.AnimalId
                     , treatmentVm.Recipe))
                 .ReverseMap();
+
+            CreateMap<Treatment, TreatmentDetailedViewModel>()
+                .ReverseMap();
         }
     }
 }

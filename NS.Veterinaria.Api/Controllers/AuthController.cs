@@ -47,9 +47,7 @@ namespace NS.Veterinary.Api.Controllers
             }
 
             foreach (var error in result.Errors)
-            {
                 Notify($"{error.Code} - {error.Description}");
-            }
 
             return CustomResponse(registerUserViewModel);
         }

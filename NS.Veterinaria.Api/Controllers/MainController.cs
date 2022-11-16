@@ -19,13 +19,13 @@ namespace NS.Veterinary.Api.Controllers
 
         protected ActionResult<ResponseApi> CustomResponse(ModelStateDictionary modelState, object data = null)
         {
-            _validateModelState(modelState);
+            ValidateModelState(modelState);
             if (!OperationIsValid())
                 return BadRequest(new ResponseApi(false, _notifier.GetNotifications().ToList(), data));
             return Ok(new ResponseApi(true, _notifier.GetNotifications().ToList(), data));
         }
 
-        private void _validateModelState(ModelStateDictionary modelState)
+        private void ValidateModelState(ModelStateDictionary modelState)
         {
             var errorsInModelState = modelState.Values.SelectMany(value => value.Errors);
             foreach (var error in errorsInModelState)
@@ -56,12 +56,13 @@ namespace NS.Veterinary.Api.Controllers
 
         protected void NotifyValidationsErrors(ValidationResult validationResult)
         {
-            var errorsMessages = validationResult.Errors.Select(error => error.ErrorMessage);
-            foreach (var errorMessage in errorsMessages)
-                Notify(errorMessage);
+            foreach (var errorMessage in validationResult.Errors)
+                Notify(errorMessage.PropertyName, errorMessage.ErrorMessage);
         }
 
         protected void Notify(string message)
             => _notifier.Handle(new Notification(message));
+        protected void Notify(string field, string message)
+            => _notifier.Handle(new Notification(field, message));
     }
 }

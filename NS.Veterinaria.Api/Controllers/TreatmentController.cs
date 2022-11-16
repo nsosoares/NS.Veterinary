@@ -21,6 +21,10 @@ namespace NS.Veterinary.Api.Controllers
         {
         }
 
+        [HttpGet("Detailed")]
+        public async Task<IEnumerable<TreatmentDetailedViewModel>> GetDetailedAsync()
+            => _mapper.Map<IEnumerable<Treatment>, IEnumerable<TreatmentDetailedViewModel>>(await _repository.GetAllAsync());
+
         [HttpGet("GetByVeterinarianId/{veterinarianId:guid}")]
         public async Task<IEnumerable<TreatmentViewModel>> GetByVeterinarianId(Guid veterinarianId)
           => _mapper.Map<IEnumerable<Treatment>, IEnumerable<TreatmentViewModel>>(await _repository.GetByVeterinarianIdAsync(veterinarianId));
