@@ -1,7 +1,10 @@
+using Hellang.Middleware.ProblemDetails;
+using Hellang.Middleware.ProblemDetails.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NS.Veterinary.Api.Configurations;
 using NS.Veterinary.Api.Data.Context;
+using NS.Veterinary.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +25,9 @@ var services = builder.Services;
 // Add services to the container.
 services.AddDbContext<VeterinaryContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+services.AddProblemDetailsWithConfigurations();
 services.AddControllers();
+services.AddProblemDetailsConventions();
 services.RegisterServices();
 
 services.AddIndentityConfiguration(builder.Configuration);
@@ -39,6 +44,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+app.UseProblemDetails();
 
 app.UseHttpsRedirection();
 

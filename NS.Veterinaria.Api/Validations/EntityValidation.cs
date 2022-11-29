@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using ErrorOr;
+using FluentValidation;
 using FluentValidation.Results;
 using NS.Veterinary.Api.Models;
 
@@ -13,11 +14,10 @@ namespace NS.Veterinary.Api.Validations
 
         public ValidationResult ValidationResult { get; protected set; }
 
-        public async Task<bool> RunValidationAsync(TEntity entity)
+        public async Task RunValidationAsync(TEntity entity)
         {
             Validate();
             ValidationResult = await ValidateAsync(entity);
-            return ValidationResult.IsValid;
         }
 
         protected abstract void Validate();

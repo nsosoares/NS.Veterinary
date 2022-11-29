@@ -5,6 +5,7 @@ using NS.Veterinary.Api.Helpers;
 using NS.Veterinary.Api.Extensions;
 using NS.Veterinary.Api.Notifications;
 using NS.Veterinary.Api.ViewModels;
+using ErrorOr;
 
 namespace NS.Veterinary.Api.Controllers
 {
@@ -29,8 +30,7 @@ namespace NS.Veterinary.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<ResponseApi>> Post([FromBody] RegisterUserViewModel registerUserViewModel)
         {
-            if (!ModelState.IsValid)
-                return CustomResponse(ModelState, registerUserViewModel);
+            if (!ModelState.IsValid) return Problem();
 
             var user = new IdentityUser
             {
@@ -43,32 +43,30 @@ namespace NS.Veterinary.Api.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return CustomResponse(JwtGenerator.GenerateJwt(_jwtSettings));
+                return Ok(JwtGenerator.GenerateJwt(_jwtSettings));
             }
 
             foreach (var error in result.Errors)
-                Notify($"{error.Code} - {error.Description}");
-
-            return CustomResponse(registerUserViewModel);
+                Notify(Error.Failure(error.Code, error.Description));
+            return Problem();
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<ResponseApi>> Login([FromBody] LoginUserViewModel loginUserViewModel)
         {
-            if(!ModelState.IsValid)
-                return CustomResponse(ModelState, loginUserViewModel);
+            if(!ModelState.IsValid) return Problem();
 
             var result = await _signInManager.PasswordSignInAsync(loginUserViewModel.Email, loginUserViewModel.Password, false, true);
 
-            if(result.Succeeded) return CustomResponse(JwtGenerator.GenerateJwt(_jwtSettings));
+            if (result.Succeeded) return Ok(JwtGenerator.GenerateJwt(_jwtSettings));
 
             if (result.IsLockedOut)
             {
                 Notify(ErrorMessage.GetErrorMessageIsLockedOut());
-                return CustomResponse(loginUserViewModel);
+                return Problem();
             }
             Notify(ErrorMessage.GetErrorMessageloginFailure());
-            return CustomResponse(loginUserViewModel);
+            return Problem();
         }
     }
 }

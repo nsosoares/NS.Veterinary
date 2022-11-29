@@ -6,6 +6,9 @@ using NS.Veterinary.Api.Validations;
 using NS.Veterinary.Api.Interfaces;
 using NS.Veterinary.Api.Notifications;
 using NS.Veterinary.Api.ViewModels;
+using Microsoft.AspNetCore.Http;
+using ErrorOr;
+using NS.Veterinary.Api.Data.FluentApis;
 
 namespace NS.Veterinary.Api.Controllers
 {
@@ -34,40 +37,40 @@ namespace NS.Veterinary.Api.Controllers
           => _mapper.Map<IEnumerable<Treatment>, IEnumerable<TreatmentViewModel>>(await _repository.GetByAnimalIdAsync(animalId));
 
         [HttpPost]
-        public async Task<ActionResult<ResponseApi>> PostAsync([FromBody] TreatmentViewModel treatmentViewModel)
+        public async Task<ActionResult> PostAsync([FromBody] TreatmentViewModel treatmentViewModel)
         {
             treatmentViewModel.ToGenerate();
             var treatment = _mapper.Map<TreatmentViewModel, Treatment>(treatmentViewModel);
-            var isValid = await RunEntityValidationAsync(treatment, new TreatmentValidation());
-            if (!isValid) return CustomResponse(treatmentViewModel);
+            var validationResult = await RunEntityValidationAsync(treatment, new TreatmentValidation());
+            if (validationResult.IsError) return Problem(validationResult.Errors);
 
             await _repository.RegisterAsync(treatment);
             await SaveChangesAsync();
-            return CustomResponse(treatmentViewModel);
+            return Ok(treatmentViewModel);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult<ResponseApi>> PutAsync([FromBody] TreatmentViewModel treatmentViewModel, Guid id)
+        public async Task<ActionResult> PutAsync([FromBody] TreatmentViewModel treatmentViewModel, Guid id)
         {
-            if (treatmentViewModel.Id != id) return NotFound();
+            if (treatmentViewModel.Id != id) return Problem(Error.NotFound());
             var treatment = _mapper.Map<TreatmentViewModel, Treatment>(treatmentViewModel);
-            var isValid = await RunEntityValidationAsync(treatment, new TreatmentValidation());
-            if (!isValid) return CustomResponse(treatmentViewModel);
+            var validationResult = await RunEntityValidationAsync(treatment, new TreatmentValidation());
+            if (validationResult.IsError) return Problem(validationResult.Errors);
 
             _repository.Update(treatment);
             await SaveChangesAsync();
-            return CustomResponse(treatmentViewModel);
+            return Ok(treatmentViewModel);
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult<ResponseApi>> DeleteAsync(Guid id)
+        public async Task<ActionResult> DeleteAsync(Guid id)
         {
             var treatment = await _repository.GetByIdAsync(id);
-            if (treatment == null) return NotFound();
+            if (treatment == null) return Problem(Error.NotFound());
 
             _repository.Delete(treatment);
             await SaveChangesAsync();
-            return CustomResponse();
+            return Ok();
         }
     }
 }

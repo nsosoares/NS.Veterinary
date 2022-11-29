@@ -1,17 +1,20 @@
-﻿namespace NS.Veterinary.Api.Notifications
+﻿using ErrorOr;
+using FluentValidation.Results;
+
+namespace NS.Veterinary.Api.Notifications
 {
     public sealed class Notifier : INotifier
     {
-        private List<Notification> _notifications;
+        private List<Error> _notifications;
         public Notifier()
         {
-            _notifications = new List<Notification>();
+            _notifications = new List<Error>();
         }
 
-        public IReadOnlyCollection<Notification> GetNotifications()
-            => _notifications;
+        public IReadOnlyCollection<Error> GetNotifications()
+            => _notifications.ToList();
 
-        public void Handle(Notification notification)
+        public void Handle(Error notification)
             => _notifications.Add(notification);
 
         public bool HasNotification()
