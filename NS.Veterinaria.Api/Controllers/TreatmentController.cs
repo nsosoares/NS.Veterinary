@@ -9,6 +9,8 @@ using NS.Veterinary.Api.ViewModels;
 using Microsoft.AspNetCore.Http;
 using ErrorOr;
 using NS.Veterinary.Api.Data.FluentApis;
+using System.Linq;
+using NS.Veterinary.Api.Extensions;
 
 namespace NS.Veterinary.Api.Controllers
 {
@@ -25,24 +27,28 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpGet("Detailed")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Find))]
         public async Task<IEnumerable<TreatmentDetailedViewModel>> GetDetailedAsync()
             => _mapper.Map<IEnumerable<Treatment>, IEnumerable<TreatmentDetailedViewModel>>(await _repository.GetAllAsync());
 
         [HttpGet("GetByVeterinarianId/{veterinarianId:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Find))]
         public async Task<IEnumerable<TreatmentViewModel>> GetByVeterinarianId(Guid veterinarianId)
           => _mapper.Map<IEnumerable<Treatment>, IEnumerable<TreatmentViewModel>>(await _repository.GetByVeterinarianIdAsync(veterinarianId));
 
         [HttpGet("GetByAnimalId/{animalId:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Find))]
         public async Task<IEnumerable<TreatmentViewModel>> GetByAnimalId(Guid animalId)
           => _mapper.Map<IEnumerable<Treatment>, IEnumerable<TreatmentViewModel>>(await _repository.GetByAnimalIdAsync(animalId));
 
         [HttpPost]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
         public async Task<ActionResult> PostAsync([FromBody] TreatmentViewModel treatmentViewModel)
         {
             treatmentViewModel.ToGenerate();
             var treatment = _mapper.Map<TreatmentViewModel, Treatment>(treatmentViewModel);
-            var validationResult = await RunEntityValidationAsync(treatment, new TreatmentValidation());
-            if (validationResult.IsError) return Problem(validationResult.Errors);
+            var validationResult = await EntityValidationAsync(treatment, new TreatmentValidation());
+            if (!validationResult.IsValid) return ValidationProblem(new ValidationProblemDetails(validationResult.Errors.ToDictionary()));
 
             await _repository.RegisterAsync(treatment);
             await SaveChangesAsync();
@@ -50,12 +56,13 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
         public async Task<ActionResult> PutAsync([FromBody] TreatmentViewModel treatmentViewModel, Guid id)
         {
             if (treatmentViewModel.Id != id) return Problem(Error.NotFound());
             var treatment = _mapper.Map<TreatmentViewModel, Treatment>(treatmentViewModel);
-            var validationResult = await RunEntityValidationAsync(treatment, new TreatmentValidation());
-            if (validationResult.IsError) return Problem(validationResult.Errors);
+            var validationResult = await EntityValidationAsync(treatment, new TreatmentValidation());
+            if (!validationResult.IsValid) return ValidationProblem(new ValidationProblemDetails(validationResult.Errors.ToDictionary()));
 
             _repository.Update(treatment);
             await SaveChangesAsync();
@@ -63,6 +70,7 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Delete))]
         public async Task<ActionResult> DeleteAsync(Guid id)
         {
             var treatment = await _repository.GetByIdAsync(id);

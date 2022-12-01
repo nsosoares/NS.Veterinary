@@ -1,10 +1,12 @@
 using Hellang.Middleware.ProblemDetails;
 using Hellang.Middleware.ProblemDetails.Mvc;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NS.Veterinary.Api.Configurations;
 using NS.Veterinary.Api.Data.Context;
 using NS.Veterinary.Api.Extensions;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,21 @@ services.AddAutoMapper(typeof(Program).Assembly);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
+
+services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("pt-BR")
+    };
+
+    options.DefaultRequestCulture = new RequestCulture(culture: "pt-BR", uiCulture: "pt-BR");
+
+    options.AddInitialRequestCultureProvider(new CustomRequestCultureProvider(async context =>
+    {
+        return await Task.FromResult(new ProviderCultureResult("pt"));
+    }));
+});
 
 var app = builder.Build();
 

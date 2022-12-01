@@ -32,10 +32,12 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpGet]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Find))]
         public async Task<IEnumerable<TViewModel>> GetAsync()
             =>  _mapper.Map<IEnumerable<TEntity>, IEnumerable<TViewModel>>(await _repository.GetAllAsync());
 
         [HttpGet("{id:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Find))]
         public async Task<TViewModel> GetByIdAsync(Guid id)
             => _mapper.Map<TEntity, TViewModel>(await _repository.GetByIdAsync(id));
 

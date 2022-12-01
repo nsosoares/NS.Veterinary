@@ -8,6 +8,8 @@ using NS.Veterinary.Api.Notifications;
 using NS.Veterinary.Api.ViewModels;
 using NS.Veterinary.Api.Data.FluentApis;
 using ErrorOr;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using NS.Veterinary.Api.Extensions;
 
 namespace NS.Veterinary.Api.Controllers
 {
@@ -25,12 +27,12 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ResponseApi>> PostAsync([FromBody] VeterinarianViewModel veterinarianViewModel)
+        public async Task<ActionResult> PostAsync([FromBody] VeterinarianViewModel veterinarianViewModel)
         {
             veterinarianViewModel.ToGenerate();
             var veterinarian = _mapper.Map<VeterinarianViewModel, Veterinarian>(veterinarianViewModel);
-            var validationResult = await RunEntityValidationAsync(veterinarian, new VeterinarianValidation());
-            if (validationResult.IsError) return Problem(validationResult.Errors);
+            var validationResult = await EntityValidationAsync(veterinarian, new VeterinarianValidation());
+            if (!validationResult.IsValid) return ValidationProblem(new ValidationProblemDetails(validationResult.Errors.ToDictionary()));
 
             await _repository.RegisterAsync(veterinarian);
             await SaveChangesAsync();
@@ -38,12 +40,12 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult<ResponseApi>> PutAsync([FromBody] VeterinarianViewModel veterinarianViewModel, Guid id)
+        public async Task<ActionResult> PutAsync([FromBody] VeterinarianViewModel veterinarianViewModel, Guid id)
         {
             if (veterinarianViewModel.Id != id) return Problem(Error.NotFound());
             var veterinarian = _mapper.Map<VeterinarianViewModel, Veterinarian>(veterinarianViewModel);
-            var validationResult = await RunEntityValidationAsync(veterinarian, new VeterinarianValidation());
-            if (validationResult.IsError) return Problem(validationResult.Errors);
+            var validationResult = await EntityValidationAsync(veterinarian, new VeterinarianValidation());
+            if (!validationResult.IsValid) return ValidationProblem(new ValidationProblemDetails(validationResult.Errors.ToDictionary()));
 
             _repository.Update(veterinarian);
             await SaveChangesAsync();
@@ -51,7 +53,7 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult<ResponseApi>> DeleteAsync(Guid id)
+        public async Task<ActionResult> DeleteAsync(Guid id)
         {
             var veterinarian = await _repository.GetByIdAsync(id);
             if (veterinarian == null) return Problem(Error.NotFound());

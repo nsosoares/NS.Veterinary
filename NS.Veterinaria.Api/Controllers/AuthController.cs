@@ -28,7 +28,7 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ResponseApi>> Post([FromBody] RegisterUserViewModel registerUserViewModel)
+        public async Task<ActionResult> Post([FromBody] RegisterUserViewModel registerUserViewModel)
         {
             if (!ModelState.IsValid) return Problem();
 
@@ -52,7 +52,7 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<ResponseApi>> Login([FromBody] LoginUserViewModel loginUserViewModel)
+        public async Task<ActionResult> Login([FromBody] LoginUserViewModel loginUserViewModel)
         {
             if(!ModelState.IsValid) return Problem();
 
