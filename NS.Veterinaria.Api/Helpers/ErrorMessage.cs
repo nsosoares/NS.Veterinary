@@ -1,4 +1,6 @@
-﻿namespace NS.Veterinary.Api.Helpers
+﻿using ErrorOr;
+
+namespace NS.Veterinary.Api.Helpers
 {
     public static class ErrorMessage
     {
@@ -11,13 +13,12 @@
         public static string GetErrorMessageMinLenght(string propertie, int characters)
             => $"O campo {propertie} necessita de no minimo {characters} caracteres.";
 
-        public static string GetErrorMessageCommit()
-            => "Não foi possivel salvar as informações";
+        public static Error GetErrorMessageCommit() => Error.Failure(description: "Não foi possivel salvar as informações");
 
-        public static string GetErrorMessageIsLockedOut()
-            => "Usuario temporariamete bloqueado devido a tentativas de login.";
+        public static Error GetErrorMessageIsLockedOut()
+            => Error.Failure(description: "Usuario temporariamete bloqueado devido a tentativas de login.");
 
-        public static string GetErrorMessageloginFailure()
-            => "Usuario ou senha incorreto.";
+        public static Error GetErrorMessageloginFailure()
+            => Error.Failure(description: "Usuario ou senha incorreto.");
     }
 }

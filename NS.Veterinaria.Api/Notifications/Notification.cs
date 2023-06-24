@@ -4,16 +4,17 @@
     {
         public Notification(string mensagem)
         {
-            Mensagem = mensagem;
+            Message = mensagem;
         }
 
-        public Notification(int codigo, string mensagem)
+        public Notification(string field, string message)
         {
-            Codigo = codigo;
-            Mensagem = mensagem;
+            Field = field;
+            Message = message;
         }
 
-        public int Codigo { get; private set; }
-        public string Mensagem { get; private set; }
+        public int Code { get; private set; }
+        public string Field { get; private set; }
+        public string Message { get; private set; }
     }
 }

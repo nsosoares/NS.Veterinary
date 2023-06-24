@@ -32,12 +32,43 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpGet]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Find))]
         public async Task<IEnumerable<TViewModel>> GetAsync()
             =>  _mapper.Map<IEnumerable<TEntity>, IEnumerable<TViewModel>>(await _repository.GetAllAsync());
 
         [HttpGet("{id:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Find))]
         public async Task<TViewModel> GetByIdAsync(Guid id)
             => _mapper.Map<TEntity, TViewModel>(await _repository.GetByIdAsync(id));
+
+        //[HttpGet("error")]
+        //public async Task<TViewModel> ErrorTest()
+        //    => throw new Exception("Ocorreu um erro");
+        //[HttpPost("error")]
+        //public async Task<TViewModel> ErrorTestPost()
+        //    => throw new Exception("Ocorreu um erro");
+
+
+        //[HttpGet("errortratado")]
+        //public ActionResult<ResponseApi> ErrorTratado()
+        //{
+        //    _notifier.Handle(new Notification("Teste"));
+        //    return CustomResponse();
+        //}
+
+        //[HttpPost("errortratado")]
+        //public ActionResult<ResponseApi> ErrorTratadoPost()
+        //{
+        //    _notifier.Handle(new Notification("Teste"));
+        //    return CustomResponse("aa");
+        //}
+
+        //[HttpGet("errorTeste")]
+        //public ActionResult Teste()
+        //{
+        //    _notifier.Handle(new Notification("Teste"));
+        //    return Problem();
+        //}
 
         protected async Task SaveChangesAsync()
         {

@@ -1,14 +1,16 @@
-﻿using FluentValidation.Results;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NS.Veterinary.Api.Models;
 using NS.Veterinary.Api.Validations;
 using NS.Veterinary.Api.Notifications;
 using NS.Veterinary.Api.ViewModels;
+using ErrorOr;
+using FluentValidation.Results;
 
 namespace NS.Veterinary.Api.Controllers
 {
     [ApiController]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public abstract class MainController : ControllerBase
     {
         protected readonly INotifier _notifier;
@@ -17,51 +19,67 @@ namespace NS.Veterinary.Api.Controllers
             _notifier = notifier;
         }
 
-        protected ActionResult<ResponseApi> CustomResponse(ModelStateDictionary modelState, object data = null)
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        protected ActionResult Problem(List<Error> errors)
         {
-            _validateModelState(modelState);
-            if (!OperationIsValid())
-                return BadRequest(new ResponseApi(false, _notifier.GetNotifications().ToList(), data));
-            return Ok(new ResponseApi(true, _notifier.GetNotifications().ToList(), data));
-        }
-
-        private void _validateModelState(ModelStateDictionary modelState)
-        {
-            var errorsInModelState = modelState.Values.SelectMany(value => value.Errors);
-            foreach (var error in errorsInModelState)
+            var firstError = errors.FirstOrDefault();
+            var statusCode = firstError.Type switch
             {
-                Notify(error.ErrorMessage);
-            }
+                ErrorType.Validation => StatusCodes.Status400BadRequest,
+                ErrorType.Conflict => StatusCodes.Status409Conflict,
+                ErrorType.NotFound => StatusCodes.Status404NotFound,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
+            return Problem(statusCode: (int)statusCode, title: firstError.Description);
         }
 
-        protected ActionResult<ResponseApi> CustomResponse(object data = null)
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        protected ActionResult Problem(Error error)
         {
-            if (!OperationIsValid())
-                return BadRequest(new ResponseApi(false, _notifier.GetNotifications().ToList(), data));
-            return Ok(new ResponseApi(true, _notifier.GetNotifications().ToList(), data));
+            var statusCode = error.Type switch
+            {
+                ErrorType.Validation => StatusCodes.Status400BadRequest,
+                ErrorType.Conflict => StatusCodes.Status409Conflict,
+                ErrorType.NotFound => StatusCodes.Status404NotFound,
+                _ => StatusCodes.Status500InternalServerError
+            };
+            return Problem(statusCode: statusCode, title: error.Description);
+        }
+
+        [ProducesErrorResponseType(typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        protected ActionResult Problem()
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if(!OperationIsValid())
+                return Problem(_notifier.GetNotifications().ToList());
+            return Ok();
         }
 
         protected bool OperationIsValid() => !_notifier.HasNotification();
 
-        protected async Task<bool> RunEntityValidationAsync<TEntity, TValidation>(TEntity entity, TValidation validation) 
+        [Obsolete]
+        protected async Task<ErrorOr<Success>> RunEntityValidationAsync<TEntity, TValidation>(TEntity entity, TValidation validation) 
             where TEntity : Entity
             where TValidation : EntityValidation<TEntity>
         {
-            var isValid = await validation.RunValidationAsync(entity);
-            if (isValid) return true;
-
-            NotifyValidationsErrors(validation.ValidationResult);
-            return false;
+            await validation.RunValidationAsync(entity);
+            if (validation.ValidationResult.IsValid) return Result.Success;
+            return validation.ValidationResult.Errors
+                .Select(error => Error.Validation(code: error.ErrorCode, description: error.ErrorMessage))
+                .ToList();
         }
-
-        protected void NotifyValidationsErrors(ValidationResult validationResult)
+        protected async Task<ValidationResult> EntityValidationAsync<TEntity, TValidation>(TEntity entity, TValidation validation)
+           where TEntity : Entity
+           where TValidation : EntityValidation<TEntity>
         {
-            var errorsMessages = validationResult.Errors.Select(error => error.ErrorMessage);
-            foreach (var errorMessage in errorsMessages)
-                Notify(errorMessage);
+            await validation.RunValidationAsync(entity);
+            return validation.ValidationResult;
         }
 
-        protected void Notify(string message)
-            => _notifier.Handle(new Notification(message));
+        protected void Notify(Error error)
+            => _notifier.Handle(error);
     }
 }

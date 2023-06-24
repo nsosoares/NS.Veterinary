@@ -6,6 +6,10 @@ using NS.Veterinary.Api.Validations;
 using NS.Veterinary.Api.Interfaces;
 using NS.Veterinary.Api.Notifications;
 using NS.Veterinary.Api.ViewModels;
+using ErrorOr;
+using NS.Veterinary.Api.Data.FluentApis;
+using System.Linq;
+using NS.Veterinary.Api.Extensions;
 
 namespace NS.Veterinary.Api.Controllers
 {
@@ -19,40 +23,40 @@ namespace NS.Veterinary.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ResponseApi>> PostAsync([FromBody] AnimalViewModel animalViewModel)
+        public async Task<ActionResult> PostAsync([FromBody] AnimalViewModel animalViewModel)
         {
             animalViewModel.ToGenerate();
             var animal = _mapper.Map<AnimalViewModel, Animal>(animalViewModel);
-            var isValid = await RunEntityValidationAsync(animal, new AnimalValidation());
-            if (!isValid) return CustomResponse(animalViewModel);
+            var validationResult = await EntityValidationAsync(animal, new AnimalValidation());
+            if (!validationResult.IsValid) return ValidationProblem(new ValidationProblemDetails(validationResult.Errors.ToDictionary()));
 
             await _repository.RegisterAsync(animal);
             await SaveChangesAsync();
-            return CustomResponse(animalViewModel);
+            return Ok(animalViewModel);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult<ResponseApi>> PutAsync([FromBody] AnimalViewModel animalViewModel, Guid id)
+        public async Task<ActionResult> PutAsync([FromBody] AnimalViewModel animalViewModel, Guid id)
         {
-            if(animalViewModel.Id != id) return NotFound();
+            if(animalViewModel.Id != id) return Problem(Error.NotFound());
             var animal = _mapper.Map<AnimalViewModel, Animal>(animalViewModel);
-            var isValid = await RunEntityValidationAsync(animal, new AnimalValidation());
-            if (!isValid) return CustomResponse(animalViewModel);
+            var validationResult = await EntityValidationAsync(animal, new AnimalValidation());
+            if (!validationResult.IsValid) return ValidationProblem(new ValidationProblemDetails(validationResult.Errors.ToDictionary()));
 
             _repository.Update(animal);
             await SaveChangesAsync();
-            return CustomResponse(animalViewModel);
+            return Ok(animalViewModel);
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult<ResponseApi>> DeleteAsync(Guid id)
+        public async Task<ActionResult> DeleteAsync(Guid id)
         {
             var animal = await _repository.GetByIdAsync(id);
-            if(animal == null) return NotFound();
+            if(animal == null) return Problem(Error.NotFound());
 
             _repository.Delete(animal);
             await SaveChangesAsync();
-            return CustomResponse();
+            return Ok();
         }
     }
 }

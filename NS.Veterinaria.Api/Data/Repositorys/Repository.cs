@@ -16,7 +16,7 @@ namespace NS.Veterinary.Api.Data.Repositorys
             _table = _context.Set<TEntity>();
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public async virtual Task<IEnumerable<TEntity>> GetAllAsync()
             => await _table.AsNoTracking().ToListAsync();
 
         public async Task<TEntity> GetByIdAsync(Guid id)
